@@ -15,6 +15,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 
 /**
  * 索引检索 args: index key(查询内容)
@@ -38,6 +39,7 @@ public class SearcherApplication {
   private static void search(String indexDirectory, String queryStr)
       throws IOException, ParseException {
     Directory directory = FSDirectory.open(new File(indexDirectory).toPath());
+
     IndexReader indexReader = DirectoryReader.open(directory);
     IndexSearcher indexSearcher = new IndexSearcher(indexReader);
     QueryParser queryParser = new QueryParser("context", new StandardAnalyzer());

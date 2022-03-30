@@ -67,7 +67,6 @@ public class IndexerApplication {
         indexFile(file);
       }
     }
-
     return indexWriter.numDocs();
   }
 
