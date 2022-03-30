@@ -17,7 +17,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 /**
- * 检索
+ * 索引检索 args: index key(查询内容)
  *
  * @author kevin
  */
@@ -50,7 +50,8 @@ public class SearcherApplication {
             hits.totalHits, end - start, queryKey));
     for (ScoreDoc scoreDoc : hits.scoreDocs) {
       Document doc = indexSearcher.doc(scoreDoc.doc);
-      Logger.getGlobal().info(doc.get("path"));
+      String path = doc.get("path");
+      Logger.getGlobal().info("" + path);
     }
   }
 

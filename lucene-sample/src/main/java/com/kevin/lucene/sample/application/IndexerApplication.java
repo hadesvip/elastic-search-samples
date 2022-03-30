@@ -20,6 +20,7 @@ import org.apache.lucene.store.FSDirectory;
 /**
  * 索引建立
  *
+ * args: index data
  * @author kevin
  */
 public class IndexerApplication {
