@@ -29,12 +29,10 @@ public class IndexerApplication {
   private final IndexWriter indexWriter;
 
   public static void main(String[] args) throws IOException {
-
     if (args.length != 2) {
       String errorMessage = String
           .format("Usage: java %s <index dir> <data dir>", IndexerApplication.class.getName());
       throw new IllegalArgumentException(errorMessage);
-
     }
     String indexDirectory = args[0];
     String dataDirectory = args[1];

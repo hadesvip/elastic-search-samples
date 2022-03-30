@@ -35,19 +35,19 @@ public class SearcherApplication {
     search(indexDirectory, queryKey);
   }
 
-  private static void search(String indexDirectory, String queryKey)
+  private static void search(String indexDirectory, String queryStr)
       throws IOException, ParseException {
     Directory directory = FSDirectory.open(new File(indexDirectory).toPath());
     IndexReader indexReader = DirectoryReader.open(directory);
     IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-    QueryParser parser = new QueryParser("context", new StandardAnalyzer());
-    Query query = parser.parse(queryKey);
+    QueryParser queryParser = new QueryParser("context", new StandardAnalyzer());
+    Query query = queryParser.parse(queryStr);
     long start = System.currentTimeMillis();
     TopDocs hits = indexSearcher.search(query, 10);
     long end = System.currentTimeMillis();
     Logger.getGlobal()
         .info(String.format("Found %s document(s) (in %s millseconds) that matched query %s",
-            hits.totalHits, end - start, queryKey));
+            hits.totalHits, end - start, queryStr));
     for (ScoreDoc scoreDoc : hits.scoreDocs) {
       Document doc = indexSearcher.doc(scoreDoc.doc);
       String path = doc.get("path");
