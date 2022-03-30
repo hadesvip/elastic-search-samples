@@ -3,6 +3,7 @@ package com.kevin.lucene.sample.application;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
@@ -24,7 +25,7 @@ import org.apache.lucene.store.FSDirectory;
 public class IndexerApplication {
 
 
-  private IndexWriter indexWriter;
+  private final IndexWriter indexWriter;
 
   public static void main(String[] args) throws IOException {
 
@@ -51,17 +52,17 @@ public class IndexerApplication {
   }
 
 
-  public IndexerApplication(String indexDir) throws IOException {
-    Directory directory = FSDirectory.open(new File(indexDir).toPath());
+  public IndexerApplication(String indexDirectory) throws IOException {
+    Directory directory = FSDirectory.open(new File(indexDirectory).toPath());
     Analyzer analyzer = new StandardAnalyzer();
     IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
     indexWriter = new IndexWriter(directory, indexWriterConfig);
   }
 
-  public int index(String dataDir, FileFilter filter) throws IOException {
-    File[] fileArray = new File(dataDir).listFiles();
+  public int index(String dataDirectory, FileFilter filter) throws IOException {
+    File[] fileArray = new File(dataDirectory).listFiles();
 
-    for (File file : fileArray) {
+    for (File file : Objects.requireNonNull(fileArray)) {
       if (!file.isDirectory() && !file.isHidden() && file.exists()
           && file.canRead() && (filter == null || filter.accept(file))) {
         indexFile(file);
@@ -78,20 +79,16 @@ public class IndexerApplication {
   }
 
   private Document getDocument(File file) throws IOException {
-    //取文件名
     String fileName = file.getName();
-    //文件的路径
     String path = file.getPath();
-    //文件的内容
     String fileContext = FileUtils.readFileToString(file, "utf-8");
     //创建Field
-    //参数1:域的名称,参数2：域的内容，参数3：是否储存
+    //参数1:域的名称；参数2：域的内容；参数3：是否储存
     Field fieldName = new TextField("name", fileName, Field.Store.YES);
     Field fieldPath = new StoredField("path", path);
     Field fieldContext = new TextField("context", fileContext, Field.Store.YES);
-    //创建文档对象
+    //构建Document
     Document document = new Document();
-    //4.向文档对象中添加域
     document.add(fieldName);
     document.add(fieldPath);
     document.add(fieldContext);
