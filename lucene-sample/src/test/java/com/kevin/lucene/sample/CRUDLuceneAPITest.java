@@ -35,16 +35,8 @@ public class CRUDLuceneAPITest {
     public void init() throws IOException {
         directory = new RAMDirectory();
         //按照空格分词
-        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new WhitespaceAnalyzer());
-        indexWriter = new IndexWriter(directory, indexWriterConfig);
+        indexWriter = buildIndexWriter();
     }
-
-    @Test
-    @DisplayName("删除文档")
-    public void deleteDocumentTest() {
-
-    }
-
 
     @Test
     @DisplayName("检索测试")
@@ -59,7 +51,57 @@ public class CRUDLuceneAPITest {
         Logger.getGlobal().info(String.format("searcher hits:%s", hit));
     }
 
-    void destroy() throws IOException {
+    @Test
+    public void indexReaderTest() throws IOException {
+        addDocument();
+        destroy();
+        IndexReader indexReader = DirectoryReader.open(directory);
+        Logger.getGlobal().info(String.format("索引中管理的文档数量:%s,程序写入的文档数量:%s。",
+                indexReader.maxDoc(), idArray.length));
+        Logger.getGlobal().info(String.format("索引中管理的文档数量:%s,程序写入的文档数量:%s。",
+                indexReader.numDocs(), idArray.length));
+        indexReader.close();
+    }
+
+
+    @Test
+    @DisplayName("删除文档")
+    public void deleteDocumentTest() throws IOException {
+        addDocument();
+        indexWriter.deleteDocuments(new Term("id", "1"));
+        indexWriter.commit();
+        Logger.getGlobal().info("=========================");
+        Logger.getGlobal().info(String.format("索引中是否包含删除标记:%s", indexWriter.hasDeletions()));
+        Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
+                indexWriter.maxDoc(), idArray.length));
+        Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
+                indexWriter.numDocs(), idArray.length));
+        destroy();
+    }
+
+
+    @Test
+    @DisplayName("删除文档并进行合并")
+    public void deleteDocumentAndForceMergeTest() throws IOException {
+        addDocument();
+        indexWriter.deleteDocuments(new Term("id", "1"));
+        indexWriter.forceMerge(1);
+        indexWriter.commit();
+
+        Logger.getGlobal().info("=====索引合并完成=====");
+        Logger.getGlobal().info("=====================");
+        Logger.getGlobal().info(String.format("索引中是否包含删除标记:%s", indexWriter.hasDeletions()));
+        Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
+                indexWriter.maxDoc(), idArray.length));
+        Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
+                indexWriter.numDocs(), idArray.length));
+        indexWriter.close();
+    }
+
+
+    /*=====================非核心测试方法=========================*/
+
+    public void destroy() throws IOException {
         String content = String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
                 indexWriter.numDocs(), idArray.length);
         Logger.getGlobal().info(content);
@@ -76,6 +118,11 @@ public class CRUDLuceneAPITest {
             document.add(new TextField("city", textArray[i], Field.Store.YES));
             indexWriter.addDocument(document);
         }
+    }
+
+    IndexWriter buildIndexWriter() throws IOException {
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new WhitespaceAnalyzer());
+        return new IndexWriter(directory, indexWriterConfig);
     }
 
 }
