@@ -97,11 +97,16 @@ public class CRUDLuceneAPITest {
     public void updateDocumentTest() throws IOException {
         addDocument();
 
-//        indexWriter.updateDocument();
+        Document document = new Document();
+        document.add(new StringField("id", "1", Field.Store.YES));
+        document.add(new StoredField("country", "Netherlands"));
+        document.add(new TextField("contents", "Den Haag has a lot of museums", Field.Store.NO));
+        document.add(new TextField("city", "Den Haag", Field.Store.YES));
 
-
-
-
+        indexWriter.updateDocument(new Term("id", "1"), document);
+        indexWriter.close();
+        search("city", "Amsterdam");
+        search("city", "Haag");
     }
 
 
