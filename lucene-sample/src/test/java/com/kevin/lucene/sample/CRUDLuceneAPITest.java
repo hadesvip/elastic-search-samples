@@ -43,12 +43,7 @@ public class CRUDLuceneAPITest {
     public void searchTest() throws IOException {
         addDocument();
         destroy();
-        IndexReader indexWriter = DirectoryReader.open(directory);
-        IndexSearcher indexSearcher = new IndexSearcher(indexWriter);
-        Term term = new Term("city", "Amsterdam");
-        Query termQuery = new TermQuery(term);
-        int hit = indexSearcher.search(termQuery, 1).totalHits;
-        Logger.getGlobal().info(String.format("searcher hits:%s", hit));
+        search("city", "Amsterdam");
     }
 
     @Test
@@ -85,9 +80,9 @@ public class CRUDLuceneAPITest {
     public void deleteDocumentAndForceMergeTest() throws IOException {
         addDocument();
         indexWriter.deleteDocuments(new Term("id", "1"));
+        //TODO
         indexWriter.forceMerge(1);
         indexWriter.commit();
-
         Logger.getGlobal().info("=====索引合并完成=====");
         Logger.getGlobal().info("=====================");
         Logger.getGlobal().info(String.format("索引中是否包含删除标记:%s", indexWriter.hasDeletions()));
@@ -96,6 +91,17 @@ public class CRUDLuceneAPITest {
         Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
                 indexWriter.numDocs(), idArray.length));
         indexWriter.close();
+    }
+
+    @Test
+    public void updateDocumentTest() throws IOException {
+        addDocument();
+
+//        indexWriter.updateDocument();
+
+
+
+
     }
 
 
@@ -123,6 +129,15 @@ public class CRUDLuceneAPITest {
     IndexWriter buildIndexWriter() throws IOException {
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new WhitespaceAnalyzer());
         return new IndexWriter(directory, indexWriterConfig);
+    }
+
+    void search(String fieldName, String value) throws IOException {
+        IndexReader indexReader = DirectoryReader.open(directory);
+        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+        Term term = new Term(fieldName, value);
+        Query termQuery = new TermQuery(term);
+        int hit = indexSearcher.search(termQuery, 1).totalHits;
+        Logger.getGlobal().info(String.format("searcher hits:%s", hit));
     }
 
 }
