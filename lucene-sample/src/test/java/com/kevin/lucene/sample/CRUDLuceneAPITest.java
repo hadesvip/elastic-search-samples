@@ -33,8 +33,8 @@ public class CRUDLuceneAPITest {
 
     @BeforeEach
     public void init() throws IOException {
+        //基于内存索引目录，程序停止后消失。
         directory = new RAMDirectory();
-        //按照空格分词
         indexWriter = buildIndexWriter();
     }
 
@@ -107,6 +107,9 @@ public class CRUDLuceneAPITest {
         indexWriter.commit();
         Logger.getGlobal().info("=====索引合并完成=====");
         Logger.getGlobal().info("=====================");
+
+        //maxDoc：正常文档+删除文档
+        //numDocs：正常文档
         Logger.getGlobal().info(String.format("索引中是否包含删除标记:%s", indexWriter.hasDeletions()));
         Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
                 indexWriter.maxDoc(), idArray.length));
@@ -165,6 +168,7 @@ public class CRUDLuceneAPITest {
     }
 
     IndexWriter buildIndexWriter() throws IOException {
+        //按照空格分词
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new WhitespaceAnalyzer());
         return new IndexWriter(directory, indexWriterConfig);
     }
