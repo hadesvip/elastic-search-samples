@@ -98,11 +98,13 @@ public class CRUDLuceneAPITest {
 
 
     @Test
-    @DisplayName("删除文档并进行合并")
+    @DisplayName("索引合并")
     public void deleteDocumentAndForceMergeTest() throws IOException {
         addDocument();
         indexWriter.deleteDocuments(new Term("id", "1"));
-        //TODO
+        Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
+            indexWriter.maxDoc(), idArray.length));
+        //索引合并,把删除的文件真正的删除。
         indexWriter.forceMerge(1);
         indexWriter.commit();
         Logger.getGlobal().info("=====索引合并完成=====");
@@ -110,9 +112,10 @@ public class CRUDLuceneAPITest {
 
         //maxDoc：正常文档+删除文档
         //numDocs：正常文档
-        Logger.getGlobal().info(String.format("索引中是否包含删除标记:%s", indexWriter.hasDeletions()));
+        Logger.getGlobal().info("==========================================================");
         Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
-                indexWriter.maxDoc(), idArray.length));
+            indexWriter.maxDoc(), idArray.length));
+        Logger.getGlobal().info(String.format("索引中是否包含删除标记:%s", indexWriter.hasDeletions()));
         Logger.getGlobal().info(String.format("索引中管理文档数量:%s,程序写入的文档数量:%s",
                 indexWriter.numDocs(), idArray.length));
         indexWriter.close();
